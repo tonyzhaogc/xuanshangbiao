@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商标子类选择系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a5568;
+            --primary-light: #718096;
+            --primary-dark: #2d3748;
+            --accent-color: #48bb78;
+            --bg-white: #ffffff;
+            --bg-light: #f7fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            padding: 20px;
+            background: var(--primary-dark);
+            color: white;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* 顶部大类选择区域 */
+        .top-section {
+            padding: 16px 20px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 6px;
+            padding: 4px;
+        }
+
+        .class-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 4px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 11px;
+        }
+
+        .class-item:hover {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .class-item.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .class-item .class-id {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .class-item .class-name {
+            font-size: 10px;
+            opacity: 0.9;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+            line-height: 1.2;
+        }
+
+        /* 主体内容区域 */
+        .main-section {
+            display: flex;
+            flex: 1;
+            min-height: 600px;
+        }
+
+        /* 左侧：单个分类内容 */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .left-panel-header {
+            padding: 14px 20px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .left-panel-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .left-panel-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 左侧：类似群列表（固定） */
+        .groups-list {
+            width: 280px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+
+        .group-list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .group-list-item:hover {
+            background: var(--bg-light);
+        }
+
+        .group-list-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .group-list-item .group-id {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-right: 10px;
+            min-width: 50px;
+        }
+
+        .group-list-item.active .group-id {
+            color: white;
+        }
+
+        .group-list-item .group-name {
+            flex: 1;
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 右侧：商品列表（固定显示） */
+        .items-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .items-list-header {
+            padding: 14px 20px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .items-list-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .search-box input {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            width: 180px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .items-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 20px;
+        }
+
+        .items-list-content .item-row {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+
+        .items-list-content .item-row:hover {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .item-row.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .item-row .item-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .item-row.selected .item-checkbox {
+            background: white;
+            border-color: white;
+        }
+
+        .item-row.selected .item-checkbox::after {
+            content: '✓';
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .item-row .item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-row .item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .item-row .item-id {
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .item-row .item-name {
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-row .item-remark {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
+        .item-row.selected .item-remark {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 右侧：已选中明细列表 */
+        .right-panel {
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .right-panel-header {
+            padding: 14px 16px;
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .right-panel-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .right-panel-header h2 .count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-accent {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .right-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+        }
+
+        .class-group {
+            margin-bottom: 16px;
+        }
+
+        .class-group-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .class-group-title .class-id {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+
+        .selected-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .selected-item .item-code {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+
+        .selected-item .item-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        .selected-item .item-remove {
+            background: #fc8181;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .selected-item .item-remove:hover {
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .group-remark {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            background: var(--bg-light);
+            border-radius: 4px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: var(--shadow-md);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            font-size: 14px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1>商标子类选择系统</h1>
+        </div>
+
+        <!-- 顶部：45个大类选择（全部显示，不滚动） -->
+        <div class="top-section">
+            <div class="class-grid" id="classGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主体内容 -->
+        <div class="main-section">
+            <!-- 左侧：单个分类内容 -->
+            <div class="left-panel">
+                <div class="left-panel-header">
+                    <h2 id="leftPanelTitle">请选择商标大类</h2>
+                </div>
+                <div class="left-panel-content">
+                    <!-- 类似群列表（固定） -->
+                    <div class="groups-list" id="groupsList">
+                        <div class="empty-state">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <h3>请先选择商标大类</h3>
+                            <p>在顶部选择您需要查询的商标大类</p>
+                        </div>
+                    </div>
+                    <!-- 商品列表（固定显示） -->
+                    <div class="items-list" id="itemsList">
+                        <div class="items-list-header">
+                            <h3 id="itemsListTitle">请选择类似群</h3>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" placeholder="搜索商品名称或编码...">
+                            </div>
+                        </div>
+                        <div class="items-list-content" id="itemsListContent">
+                            <div class="empty-state">
+                                <i class="fas fa-list"></i>
+                                <h3>请先选择类似群</h3>
+                                <p>点击左侧类似群查看商品</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：已选中明细列表 -->
+            <div class="right-panel">
+                <div class="right-panel-header">
+                    <h2>
+                        <i class="fas fa-check-circle"></i>
+                        已选商标
+                        <span class="count" id="countBadge">0</span>
+                    </h2>
+                    <div class="action-buttons">
+                        <button class="btn btn-accent" onclick="copySelected()">
+                            <i class="fas fa-copy"></i> 复制
+                        </button>
+                        <button class="btn btn-primary" onclick="exportXLS()">
+                            <i class="fas fa-file-excel"></i> 导出
+                        </button>
+                        <button class="btn btn-danger" onclick="clearSelected()">
+                            <i class="fas fa-trash"></i> 清空
+                        </button>
+                    </div>
+                </div>
+                <div class="right-panel-content" id="rightPanelContent">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>还没有选择商标</h3>
+                        <p>点击商品进行选择</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        let trademarkData = [];
+        let selectedItems = [];
+        let currentClass = null;
+        let currentGroup = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('trademark_data.json');
+                trademarkData = await response.json();
+                renderClassGrid();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('classGrid').innerHTML = 
+                    '<div class="loading"><i class="fas fa-exclamation-triangle"></i><p>加载数据失败</p></div>';
+            }
+        }
+
+        function renderClassGrid() {
+            const grid = document.getElementById('classGrid');
+            grid.innerHTML = '';
+
+            trademarkData.forEach(cls => {
+                const item = document.createElement('div');
+                item.className = 'class-item';
+                item.dataset.id = cls.id;
+                item.innerHTML = `
+                    <div class="class-id">${cls.id}</div>
+                    <div class="class-name">${cls.name}</div>
+                `;
+                item.onclick = () => selectClass(cls);
+                grid.appendChild(item);
+            });
+        }
+
+        function selectClass(cls) {
+            currentClass = cls;
+            currentGroup = null;
+
+            // 更新选中状态
+            document.querySelectorAll('.class-item').forEach(el => {
+                el.classList.remove('selected');
+                if (el.dataset.id === cls.id) {
+                    el.classList.add('selected');
+                }
+            });
+
+            // 显示该大类的标题
+            document.getElementById('leftPanelTitle').innerHTML = `
+                <span style="color: var(--primary-color); font-weight: 700;">${cls.id}</span> 
+                <span style="font-weight: 500;">${cls.name}</span>
+            `;
+
+            // 显示类似群列表
+            renderGroupsList(cls);
+            
+            // 清空商品列表
+            clearItemsList();
+        }
+
+        function renderGroupsList(cls) {
+            const list = document.getElementById('groupsList');
+            
+            if (!cls.children || cls.children.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>暂无数据</h3>
+                        <p>该分类下暂无类似群数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            cls.children.forEach(group => {
+                html += `
+                    <div class="group-list-item" data-id="${group.id}" onclick="selectGroup('${group.id}')">
+                        <div class="group-id">${group.id}</div>
+                        <div class="group-name">${group.name}</div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function selectGroup(groupId) {
+            if (!currentClass) return;
+
+            // 更新选中状态
+            document.querySelectorAll('.group-list-item').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.id === groupId) {
+                    el.classList.add('active');
+                }
+            });
+
+            // 找到该类似群
+            currentGroup = currentClass.children.find(g => g.id === groupId);
+            
+            if (!currentGroup) return;
+
+            // 显示商品列表
+            renderItemsList(currentGroup);
+        }
+
+        function renderItemsList(group) {
+            const title = document.getElementById('itemsListTitle');
+            const content = document.getElementById('itemsListContent');
+            
+            title.innerHTML = `
+                <span style="color: var(--primary-color); font-weight: 700;">${group.id}</span> 
+                <span style="font-weight: 500;">${group.name}</span>
+            `;
+
+            if (!group.children || group.children.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-list"></i>
+                        <h3>暂无数据</h3>
+                        <p>该类似群下暂无商品数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            // 先显示类似群备注
+            if (group.remark) {
+                html += `
+                    <div class="group-remark">
+                        <strong>备注：</strong>${group.remark}
+                    </div>
+                `;
+            }
+
+            // 显示商品列表
+            group.children.forEach(item => {
+                html += `
+                    <div class="item-row ${isSelected(item.id) ? 'selected' : ''}" onclick="toggleItem('${item.id}')">
+                        <div class="item-checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-header">
+                                <div class="item-id">${item.id}</div>
+                                <div class="item-name">${item.name}</div>
+                            </div>
+                            ${item.remark ? `<div class="item-remark">${item.remark}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html;
+        }
+
+        function clearItemsList() {
+            document.getElementById('itemsListTitle').innerHTML = '请选择类似群';
+            document.getElementById('itemsListContent').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-list"></i>
+                    <h3>请先选择类似群</h3>
+                    <p>点击左侧类似群查看商品</p>
+                </div>
+            `;
+        }
+
+        function isSelected(itemId) {
+            return selectedItems.some(item => item.id === itemId);
+        }
+
+        function toggleItem(itemId) {
+            const item = findItem(itemId);
+            if (!item) return;
+
+            if (isSelected(itemId)) {
+                removeItem(itemId);
+            } else {
+                selectedItems.push(item);
+            }
+
+            updateRightPanel();
+            
+            // 更新商品列表选中状态
+            if (currentGroup) {
+                renderItemsList(currentGroup);
+            }
+        }
+
+        function findItem(itemId) {
+            for (const cls of trademarkData) {
+                if (!cls.children) continue;
+                for (const group of cls.children) {
+                    if (!group.children) continue;
+                    for (const item of group.children) {
+                        if (item.id === itemId) {
+                            return { ...item, className: cls.name, groupId: group.id };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function updateRightPanel() {
+            const content = document.getElementById('rightPanelContent');
+            const badge = document.getElementById('countBadge');
+
+            badge.textContent = selectedItems.length;
+
+            if (selectedItems.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>还没有选择商标</h3>
+                        <p>点击商品进行选择</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按大类分组
+            const grouped = {};
+            selectedItems.forEach(item => {
+                const classId = item.id.slice(0, 2);
+                if (!grouped[classId]) {
+                    grouped[classId] = [];
+                }
+                grouped[classId].push(item);
+            });
+
+            let html = '';
+            for (const [classId, items] of Object.entries(grouped)) {
+                html += `
+                    <div class="class-group">
+                        <div class="class-group-title">
+                            <span class="class-id">${classId}</span>
+                            ${items.length} 项
+                        </div>
+                        ${items.map(item => `
+                            <div class="selected-item">
+                                <div class="item-info">
+                                    <div class="item-code">${item.id}</div>
+                                    <div class="item-text">${item.name}</div>
+                                </div>
+                                <button class="item-remove" onclick="removeItem('${item.id}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function removeItem(itemId) {
+            selectedItems = selectedItems.filter(item => item.id !== itemId);
+            updateRightPanel();
+            if (currentGroup) {
+                renderItemsList(currentGroup);
+            }
+        }
+
+        function clearSelected() {
+            if (selectedItems.length === 0) {
+                showToast('还没有选择任何商标');
+                return;
+            }
+            selectedItems = [];
+            updateRightPanel();
+            if (currentGroup) {
+                renderItemsList(currentGroup);
+            }
+            showToast('已清空所有选择');
+        }
+
+        function copySelected() {
+            if (selectedItems.length === 0) {
+                showToast('请先选择商标');
+                return;
+            }
+
+            const text = selectedItems.map(item => `${item.id}\t${item.name}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('已复制到剪贴板');
+            }).catch(() => {
+                showToast('复制失败');
+            });
+        }
+
+        function exportXLS() {
+            if (selectedItems.length === 0) {
+                showToast('请先选择商标');
+                return;
+            }
+
+            let csv = '大类,类似群,商品编码,商品名称,备注\n';
+            selectedItems.forEach(item => {
+                const classId = item.id.slice(0, 2);
+                const groupId = item.id.slice(0, 4);
+                // 使用逗号分隔，并给包含逗号的字段加引号
+                const name = item.name.includes(',') ? `"${item.name}"` : item.name;
+                const remark = item.remark ? (item.remark.includes(',') ? `"${item.remark}"` : item.remark) : '';
+                csv += `${classId},${groupId},${item.id},${name},${remark}\n`;
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '商标分类_' + new Date().toISOString().slice(0,10) + '.csv';
+            link.click();
+            showToast('导出成功');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (!currentGroup) return;
+
+            const content = document.getElementById('itemsListContent');
+            const items = content.querySelectorAll('.item-row');
+            items.forEach(item => {
+                const id = item.querySelector('.item-id').textContent.toLowerCase();
+                const name = item.querySelector('.item-name').textContent.toLowerCase();
+                const remark = item.querySelector('.item-remark')?.textContent.toLowerCase() || '';
+                const matches = id.includes(query) || name.includes(query) || remark.includes(query);
+                item.style.display = matches ? 'flex' : 'none';
+            });
+        });
+
+        loadData();
+    </script>
+</body>
+</html>
