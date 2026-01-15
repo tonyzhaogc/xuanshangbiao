@@ -150,8 +150,8 @@ be28c37 Add LICENSE file and update documentation for GitHub Pages deployment
 
 ### 联系方式
 
-- GitHub Issues：https://github.com/tonyzhaogc/xuanshangbiao/issues
-- 仓库地址：https://github.com/tonyzhaogc/xuanshangbiao
+- GitHub Issues：https://github.com/tonyzgc/xuanshangbiao/issues
+- 仓库地址：https://github.com/tonyzgc/xuanshangbiao
 - 在线访问：https://xuanshangbiao.com
 
 ---
