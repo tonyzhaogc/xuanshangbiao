@@ -536,6 +536,208 @@
             background: var(--primary-light);
         }
 
+        /* 移动端响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 0;
+            }
+
+            .page-header h1 {
+                font-size: 20px;
+            }
+
+            .class-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                gap: 4px;
+            }
+
+            .class-item {
+                padding: 4px 2px;
+                font-size: 10px;
+            }
+
+            .class-item .class-id {
+                font-size: 12px;
+            }
+
+            .class-item .class-name {
+                font-size: 9px;
+            }
+
+            /* 主体内容改为纵向排列 */
+            .main-section {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            /* 左侧面板 */
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                min-height: 400px;
+            }
+
+            .left-panel-header h2 {
+                font-size: 14px;
+            }
+
+            /* 左侧内容改为纵向排列 */
+            .left-panel-content {
+                flex-direction: column;
+            }
+
+            /* 类似群列表在移动端也占满宽度 */
+            .groups-list {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 8px 0;
+            }
+
+            .group-list-item {
+                padding: 8px 12px;
+            }
+
+            .group-list-item .group-id {
+                font-size: 13px;
+                min-width: 45px;
+            }
+
+            .group-list-item .group-name {
+                font-size: 12px;
+            }
+
+            /* 商品列表占满宽度 */
+            .items-list {
+                flex: 1;
+                min-height: 300px;
+            }
+
+            .items-list-header {
+                padding: 10px 12px;
+            }
+
+            .items-list-header h3 {
+                font-size: 13px;
+            }
+
+            .search-box input {
+                width: 120px;
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+
+            .items-list-content {
+                padding: 8px 12px;
+            }
+
+            .items-list-content .item-row {
+                padding: 8px 10px;
+                margin-bottom: 6px;
+            }
+
+            .items-list-content .item-id {
+                font-size: 12px;
+            }
+
+            .items-list-content .item-name {
+                font-size: 12px;
+            }
+
+            .items-list-content .item-remark {
+                font-size: 11px;
+            }
+
+            /* 右侧面板在移动端也可以折叠显示 */
+            .right-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .right-panel-header h2 {
+                font-size: 14px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .right-panel-content {
+                padding: 8px 12px;
+            }
+
+            .empty-state {
+                padding: 20px;
+            }
+
+            .empty-state i {
+                font-size: 36px;
+                margin-bottom: 8px;
+            }
+
+            .empty-state h3 {
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .empty-state p {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                padding: 15px 10px;
+            }
+
+            .page-header h1 {
+                font-size: 18px;
+            }
+
+            .top-section {
+                padding: 12px 10px;
+            }
+
+            .left-panel-header {
+                padding: 10px 12px;
+            }
+
+            .groups-list {
+                max-height: 180px;
+            }
+
+            .items-list-header h3 {
+                font-size: 12px;
+            }
+
+            .search-box input {
+                width: 100px;
+            }
+
+            .right-panel-header {
+                padding: 10px 12px;
+            }
+
+            .right-panel-header h2 {
+                font-size: 13px;
+            }
+
+            .btn {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+
         /* 加载动画 */
         .loading {
             text-align: center;
